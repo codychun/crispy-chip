@@ -22,8 +22,8 @@ module imm_gen(
     always_comb begin
         // MUX chooses which immediate to use based on opcode (instruction type)
         case (opcode)
-            OP_LOAD:    imm = imm_i;
             OP_ALU_IMM: imm = imm_i;
+            OP_LOAD:    imm = imm_i;
             OP_STORE:   imm = imm_s;
             OP_BRANCH:  imm = imm_sb;
             OP_JUMP:    imm = imm_uj;
