@@ -1,4 +1,4 @@
-`include "include/riscv_pkg.sv"
+`include "../include/riscv_pkg.sv"
 
 module alu(
     input logic  [31:0] a,          // Operand A (rs1_data)

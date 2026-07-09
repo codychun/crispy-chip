@@ -1,4 +1,4 @@
-`include "include/riscv_pkg.sv"
+`include "../include/riscv_pkg.sv"
 
 module controller(
     input logic [6:0] opcode,
