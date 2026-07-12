@@ -1,60 +1,63 @@
-`include "../include/riscv_pkg.sv"
+`include "riscv_pkg.sv"
 
 module controller(
-    input logic [6:0] opcode,
-    input logic [2:0] funct3,
-    input logic [6:0] funct7,
+    input riscv_pkg::opcode_t opcode,
+    input riscv_pkg::alu_f3_t funct3,
+    input logic funct7_5,                // Only Bit 5 of funct7 changes
 
+    output riscv_pkg::alu_op_t alu_op,   // 11 operations (5 ALU operations --> Extra space later expansion)
     output logic reg_write_en,
     output logic alu_src_sel,
-    output logic [3:0] alu_op,   // 11 operations (5 ALU operations --> Extra space later expansion)
     output logic mem_write_en,
     output logic mem_read_en,
     output logic mem_to_reg
 );
     always_comb begin
         // Reset Default Output Controls
+        alu_op       = riscv_pkg::ALU_ADD; // Default ADDI
         reg_write_en = 1'b0;
         alu_src_sel  = 1'b1;    // 0: reg, 1: imm
-        alu_op       = ALU_ADD; // Default ADDI
         mem_write_en = 1'b0;
         mem_read_en  = 1'b0;
         mem_to_reg   = 1'b0;    // 0: alu, 1: mem
 
         // Combined Datapath Controller
         case (opcode)
-            OP_ALU_IMM: begin
+            riscv_pkg::OP_ALU_IMM: begin
+                    alu_op       = riscv_pkg::ALU_ADD;
                     reg_write_en = 1'b1;
-                    alu_op       = ALU_ADD;
                 end
-            OP_LOAD: begin
+            riscv_pkg::OP_LOAD: begin
+                    alu_op       = riscv_pkg::ALU_ADD;
                     reg_write_en = 1'b1;
-                    alu_op       = ALU_ADD;
                     mem_read_en  = 1'b1;
                     mem_to_reg   = 1'b1;
                 end 
-            OP_STORE: begin
-                    alu_op       = ALU_ADD;
+            riscv_pkg::OP_STORE: begin
+                    alu_op       = riscv_pkg::ALU_ADD;
                     mem_write_en = 1'b1;
                 end
-            OP_BRANCH: begin
+            riscv_pkg::OP_BRANCH: begin
+                    alu_op       = riscv_pkg::ALU_SUB;
                     alu_src_sel  = 1'b0;
-                    alu_op       = ALU_SUB;
                 end
-            OP_JUMP: begin
+            riscv_pkg::OP_JUMP: begin
+                    alu_op       = riscv_pkg::ALU_ADD;
                     reg_write_en = 1'b1;
-                    alu_op       = ALU_ADD;
                 end
-            OP_ALU_REG: begin
+            riscv_pkg::OP_ALU_REG: begin
                     reg_write_en = 1'b1;
                     alu_src_sel  = 1'b0;
+
                     case (funct3)
-                        FUNCT3_ADD:  alu_op = (funct7[5]) ? ALU_SUB : ALU_ADD;
-                        FUNCT3_SLL:  alu_op = ALU_SLL;
-                        FUNCT3_SRL:  alu_op = ALU_SRL;
-                        default:     alu_op = ALU_ADD;
+                        riscv_pkg::F3_ADD_SUB:  alu_op = (funct7_5) ? riscv_pkg::ALU_SUB : riscv_pkg::ALU_ADD;
+                        riscv_pkg::F3_SLL:  alu_op = riscv_pkg::ALU_SLL;
+                        riscv_pkg::F3_SRL:  alu_op = riscv_pkg::ALU_SRL;
+                        
+                        default: ;  // Keep default safe values
                     endcase
                 end
+            
             default: ;  // Keep default safe values
         endcase
     end
