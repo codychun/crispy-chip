@@ -6,7 +6,7 @@ module branch_ctl(
     input logic               less_than,
     input logic               zero,
 
-    output logic              pc_sel
+    output logic [1:0]        pc_sel        // Support expansion to JALR
 );
     logic branch_taken;
 
@@ -25,11 +25,11 @@ module branch_ctl(
 
     // PC source selection
     always_comb begin
-        pc_sel = 1'b0; 
+        pc_sel = 2'b00; 
 
         case (opcode)
-            riscv_pkg::OP_JUMP:    pc_sel = 1'b1;         // Unconditional Jump
-            riscv_pkg::OP_BRANCH:  pc_sel = branch_taken; // Conditional Branch, select based on instruction
+            riscv_pkg::OP_JUMP:    pc_sel = 2'b01;                          // Unconditional Jump
+            riscv_pkg::OP_BRANCH:  pc_sel = (branch_taken) ? 2'b01 : 2'b00; // Conditional Branch, select based on instruction
             
             riscv_pkg::OP_LOAD, 
             riscv_pkg::OP_ALU_IMM, 
