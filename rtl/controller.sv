@@ -10,16 +10,16 @@ module controller(
     output logic alu_src_sel,
     output logic mem_write_en,
     output logic mem_read_en,
-    output logic mem_to_reg
+    output logic mem_to_reg_sel
 );
     always_comb begin
         // Reset Default Output Controls
-        alu_op       = riscv_pkg::ALU_ADD; // Default ADDI
-        reg_write_en = 1'b0;
-        alu_src_sel  = 1'b1;    // 0: reg, 1: imm
-        mem_write_en = 1'b0;
-        mem_read_en  = 1'b0;
-        mem_to_reg   = 1'b0;    // 0: alu, 1: mem
+        alu_op         = riscv_pkg::ALU_ADD; // Default ADDI
+        reg_write_en   = 1'b0;
+        alu_src_sel    = 1'b1;    // 0: reg, 1: imm
+        mem_write_en   = 1'b0;
+        mem_read_en    = 1'b0;
+        mem_to_reg_sel = 1'b0;    // 0: alu, 1: mem
 
         // Combined Datapath Controller
         case (opcode)
@@ -28,10 +28,10 @@ module controller(
                     reg_write_en = 1'b1;
                 end
             riscv_pkg::OP_LOAD: begin
-                    alu_op       = riscv_pkg::ALU_ADD;
-                    reg_write_en = 1'b1;
-                    mem_read_en  = 1'b1;
-                    mem_to_reg   = 1'b1;
+                    alu_op         = riscv_pkg::ALU_ADD;
+                    reg_write_en   = 1'b1;
+                    mem_read_en    = 1'b1;
+                    mem_to_reg_sel = 1'b1;
                 end 
             riscv_pkg::OP_STORE: begin
                     alu_op       = riscv_pkg::ALU_ADD;
