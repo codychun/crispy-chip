@@ -10,7 +10,8 @@ package riscv_pkg;
         OP_STORE   = 7'b0100011,
         OP_ALU_REG = 7'b0110011,
         OP_BRANCH  = 7'b1100011,
-        OP_JUMP    = 7'b1101111
+        OP_JUMP    = 7'b1101111,
+        OP_SYSTEM  = 7'b1110011
     } opcode_t;
 
     // Instruction funct3
@@ -40,6 +41,10 @@ package riscv_pkg;
     localparam logic [6:0] F7_STD  = 7'b0000000;    // add, sll, srl
     localparam logic [6:0] F7_ALT  = 7'b0100000;    // sub
 
+    // Instruction ebreak
+    localparam logic [31:0] INSTR_EBREAK = 32'h00100073;
+
+    // ALU Opcodes
     typedef enum logic [3:0] {
         ALU_ADD    = 4'b0000,
         ALU_SUB    = 4'b0001,

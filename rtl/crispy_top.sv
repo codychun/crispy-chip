@@ -4,7 +4,8 @@ module crispy(
     input  logic clk,
     input  logic rst_n,
 
-    output logic [31:0] data_out
+    output logic [31:0] data_out,
+    output logic ebreak
 );
 
     // PC
@@ -119,7 +120,8 @@ module crispy(
         .alu_src_sel    (alu_src_sel),
         .mem_write_en   (mem_write_en),
         .mem_read_en    (mem_read_en),
-        .mem_to_reg_sel (mem_to_reg_sel)
+        .mem_to_reg_sel (mem_to_reg_sel),
+        .ebreak         (ebreak)
     );
 
     branch_ctl u_branch_ctl (

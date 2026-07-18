@@ -10,7 +10,8 @@ module controller(
     output logic alu_src_sel,
     output logic mem_write_en,
     output logic mem_read_en,
-    output logic mem_to_reg_sel
+    output logic mem_to_reg_sel,
+    output logic ebreak
 );
     always_comb begin
         // Reset Default Output Controls
@@ -20,6 +21,7 @@ module controller(
         mem_write_en   = 1'b0;
         mem_read_en    = 1'b0;
         mem_to_reg_sel = 1'b0;    // 0: alu, 1: mem
+        ebreak         = 1'b0;    // 0: program continues, 1: program ends
 
         // Combined Datapath Controller
         case (opcode)
@@ -57,6 +59,9 @@ module controller(
                         default: ;  // Keep default safe values
                     endcase
                 end
+            riscv_pkgg::OP_SYSTEM: begin
+                ebreak = 1'b1;
+            end
             
             default: ;  // Keep default safe values
         endcase
