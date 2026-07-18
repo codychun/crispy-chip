@@ -25,7 +25,7 @@ module tb_alu;
 
     // GTKWave dumpfile
     initial begin
-        $dumpfile("alu_waveform.vcd");
+        $dumpfile("build/alu_dump.vcd");
         $dumpvars(0, tb_alu);
     end
 
@@ -33,7 +33,8 @@ module tb_alu;
     initial begin  
         import riscv_pkg::*;
          
-        $monitor("Time = %0t | Input a = %d, b = %d, alu_op = %d | Output result = %d, Zero = %b, Less Than = %b", $time, t_a, t_b, t_alu_op, t_result, t_zero, t_less_than);
+        $monitor("Time = %-5t | IN: A = %10d, B = %10d, OP = %2d | OUT: RES = %10d, Z = %b, LT = %b", 
+          $time, t_a, t_b, t_alu_op, t_result, t_zero, t_less_than);
 
         // Test Case 1: Standard Addition (ADDI / ADD)
         t_a = 32'd15; t_b = 32'd10; t_alu_op = ALU_ADD;
