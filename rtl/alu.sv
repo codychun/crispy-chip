@@ -23,7 +23,7 @@ module alu(
         case (alu_op)
             riscv_pkg::ALU_ADD: result = a + b;
             riscv_pkg::ALU_SUB: result = a - b;
-            // In RISC-V, shift amounts only use the lower 5 bits (0 to 31 shifts)
+            // shift amounts only use the lower 5 bits (0 to 31 shifts)
             riscv_pkg::ALU_SLL: result = a << shift_amt;
             riscv_pkg::ALU_SRL: result = a >> shift_amt;
             default: ;
