@@ -18,24 +18,17 @@ module branch_ctl(
             riscv_pkg::F3_BEQ: branch_taken = zero;
             riscv_pkg::F3_BLT: branch_taken = less_than;
             riscv_pkg::F3_BGE: branch_taken = ~less_than;
-
-            default: ;  // Keep default safe values
         endcase
     end
 
     // PC source selection
     always_comb begin
-        pc_sel = 2'b00; 
+        pc_sel = 2'b00; // Default execution: PC + 4
 
         case (opcode)
-            riscv_pkg::OP_JUMP:    pc_sel = 2'b01;                          // Unconditional Jump
-            riscv_pkg::OP_BRANCH:  pc_sel = (branch_taken) ? 2'b01 : 2'b00; // Conditional Branch, select based on instruction
-            
-            riscv_pkg::OP_LOAD, 
-            riscv_pkg::OP_ALU_IMM, 
-            riscv_pkg::OP_STORE,
-            riscv_pkg::OP_ALU_REG: ; // Default execution: PC + 4
-            default: ;
+            riscv_pkg::OP_JUMP:     pc_sel = 2'b01;                          // Unconditional Jump
+            riscv_pkg::OP_BRANCH:   pc_sel = (branch_taken) ? 2'b01 : 2'b00; // Conditional Branch, select based on instruction
+            riscv_pkg::OP_JUMP_REG: pc_sel = 2'b10;                          // Jump and Link Register
         endcase
     end
 
