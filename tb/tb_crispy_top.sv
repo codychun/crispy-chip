@@ -61,17 +61,16 @@ module tb_crispy();
         $display("Simulation Finished!");
 
         // Automatic Linked List Verification
-        $display("========================================");
-        $display("     LINKED LIST VERIFICATION           ");
-        $display("========================================");
+        $display("======================================================");
+        $display("               LINKED LIST VERIFICATION               ");
+        $display("======================================================");
         // Read register x8 (head pointer address) and convert to word index
-        // (If 'rf' isn't the instance name in crispy.sv, change 'dut.rf' below)
         curr_node_idx = dut.u_regfile.registers[8] >> 2; 
         prev_val = -1;
         is_sorted = 1;
 
         if (curr_node_idx == 0) begin
-            $display(">>> ERROR: Head pointer (x8) is NULL (0x0)! <<<");
+            $display(">>> ERROR: Head pointer (x8) is NULL (0x0)!");
         end else begin
             while (curr_node_idx != 0) begin
                 data_val = dut.u_ram.ram[curr_node_idx + 1];
@@ -89,11 +88,11 @@ module tb_crispy();
 
             if (is_sorted) begin
                 $display("----------------------------------------");
-                $display(">>> TEST PASSED: Linked list is sorted! <<<");
+                $display(">>> TEST PASSED: Linked list is sorted!");
                 $display("----------------------------------------");
             end else begin
                 $display("----------------------------------------");
-                $display(">>> TEST FAILED: Nodes out of order! <<<");
+                $display(">>> TEST FAILED: Nodes out of order!");
                 $display("----------------------------------------");
             end
         end
