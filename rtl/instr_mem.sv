@@ -14,8 +14,8 @@ module instr_mem(
     assign instr_data = rom[instr_addr[31:2]];
 
     // Load assembly binary (hex) file
-    initial begin
-        $readmemh("program.hex", rom);
-    end
+    // initial begin
+    //     $readmemh("program.hex", rom);
+    // end
 
 endmodule
