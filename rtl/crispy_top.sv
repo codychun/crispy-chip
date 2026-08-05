@@ -13,6 +13,7 @@ module crispy(
     logic [31:0] pc_next;
     logic [31:0] pc_plus_4;
     logic [31:0] pc_branch_target;
+    logic [31:0] pc_jalr_target;
     logic [1:0]  pc_sel;
 
     // Imm Gen
@@ -31,13 +32,15 @@ module crispy(
     logic [31:0] rs2_data;
     logic [31:0] rd_data;
     logic        reg_write_en;
-    logic        mem_to_reg_sel;
+    logic [1:0]  wb_sel;
 
     // ALU
     riscv_pkg::alu_op_t alu_op;
+    logic [31:0]        alu_a;
     logic [31:0]        alu_b;
     logic [31:0]        alu_out;
-    logic               alu_src_sel;
+    logic               alu_b_sel;
+    logic               alu_a_sel;
     logic               zero;
     logic               less_than;
 
@@ -50,8 +53,9 @@ module crispy(
     logic        mem_read_en;
 
     // PC Source
-    assign pc_plus_4        = pc_out + 32'd4;  // PC Adder (+4)
-    assign pc_branch_target = pc_out + imm;    // Branch Adder (+Imm)
+    assign pc_plus_4        = pc_out + 32'd4;                  // PC Adder (PC+4)
+    assign pc_branch_target = pc_out + imm;                    // Branch Adder (PC+imm)
+    assign pc_jalr_target   = (rs1_data + imm) & 32'hFFFFFFFE; // JALR Target (rs1 + immediate), LSB cleared to 0
 
     // PC MUX
     always_comb begin
@@ -60,16 +64,26 @@ module crispy(
         case (pc_sel)
             2'b00: pc_next = pc_plus_4;
             2'b01: pc_next = pc_branch_target;
-            // 2'b10: // Future JALR support
+            2'b10: pc_next = pc_jalr_target;
             default: ;
         endcase
     end
 
-    // ALU MUX
+    // ALU A MUX
+    always_comb begin
+        alu_a = rs1_data;
+
+        case (alu_a_sel)
+            1'b0: alu_a = rs1_data; // regfile data out
+            1'b1: alu_a = pc_out;   // pc
+        endcase
+    end 
+
+    // ALU B MUX
     always_comb begin
         alu_b = 32'b0; // Default: immediate (32'b0)
 
-        case (alu_src_sel)
+        case (alu_b_sel)
             1'b0: alu_b = rs2_data; // regfile data out
             1'b1: alu_b = imm;      // immediate
         endcase
@@ -79,9 +93,10 @@ module crispy(
     always_comb begin
         rd_data = alu_out;
 
-        case (mem_to_reg_sel) 
-            1'b0: rd_data = alu_out;
-            1'b1: rd_data = mem_read_data;
+        case (wb_sel) 
+            2'b00: rd_data = alu_out;
+            2'b01: rd_data = mem_read_data;
+            2'b10: rd_data = pc_plus_4;     // JALR
         endcase
     end
 
@@ -112,16 +127,17 @@ module crispy(
     );
 
     controller u_controller (
-        .opcode         (riscv_pkg::opcode_t'(opcode)),
-        .funct3         (riscv_pkg::alu_f3_t'(funct3)),
-        .funct7_5       (funct7[5]),
-        .alu_op         (alu_op),
-        .reg_write_en   (reg_write_en),
-        .alu_src_sel    (alu_src_sel),
-        .mem_write_en   (mem_write_en),
-        .mem_read_en    (mem_read_en),
-        .mem_to_reg_sel (mem_to_reg_sel),
-        .ebreak         (ebreak)
+        .opcode       (riscv_pkg::opcode_t'(opcode)),
+        .funct3       (riscv_pkg::alu_f3_t'(funct3)),
+        .funct7_5     (funct7[5]),
+        .alu_op       (alu_op),
+        .reg_write_en (reg_write_en),
+        .alu_a_sel    (alu_a_sel),
+        .alu_b_sel    (alu_b_sel),
+        .mem_write_en (mem_write_en),
+        .mem_read_en  (mem_read_en),
+        .wb_sel       (wb_sel),
+        .ebreak       (ebreak)
     );
 
     branch_ctl u_branch_ctl (
@@ -149,7 +165,7 @@ module crispy(
     );
 
     alu u_alu (
-        .a         (rs1_data),
+        .a         (alu_a),
         .b         (alu_b),
         .alu_op    (alu_op),
         .result    (alu_out),
