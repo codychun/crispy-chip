@@ -2,12 +2,13 @@
 `timescale  1ns /1ps
 
 module tb_alu;
-    // Testbench inputs
+
+    // Testbench Inputs
     reg  [31:0] t_a;
     reg  [31:0] t_b;
     reg  [3:0]  t_alu_op;
 
-    // DUT outputs
+    // DUT Outputs
     wire [31:0] t_result;
     wire        t_zero;
     wire        t_less_than;
@@ -38,7 +39,7 @@ module tb_alu;
 
         // Test Case 1: Standard Addition (ADDI / ADD)
         t_a = 32'd15; t_b = 32'd10; t_alu_op = ALU_ADD;
-        #10;
+        #10;    // One clock cycle delay, Single cycle ALU
         assert(t_result == 32'd25) else $error("ADD Failed!");
 
         // Test Case 2: Subtraction Equal (BEQ check)
