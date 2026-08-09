@@ -12,7 +12,7 @@ module branch_ctl(
 
     // Branch conditions based on instruction
     always_comb begin
-        branch_taken = 1'b0;
+        branch_taken = 1'b0;    // Default: not taken
 
         case (funct3)
             riscv_pkg::F3_BEQ: branch_taken = zero;
