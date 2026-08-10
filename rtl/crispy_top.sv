@@ -155,6 +155,7 @@ module crispy(
 
     regfile u_regfile (
         .clk          (clk),
+        .rst_n        (rst_n),
         .reg_write_en (reg_write_en),
         .rs1_addr     (rs1_addr),
         .rs2_addr     (rs2_addr),
