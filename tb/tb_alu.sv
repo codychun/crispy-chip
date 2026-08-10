@@ -4,9 +4,9 @@
 module tb_alu;
 
     // Testbench Inputs
-    reg  [31:0] t_a;
-    reg  [31:0] t_b;
-    reg  [3:0]  t_alu_op;
+    logic  [31:0] t_a;
+    logic  [31:0] t_b;
+    logic  [3:0]  t_alu_op;
 
     // DUT Outputs
     logic [31:0] t_result;
